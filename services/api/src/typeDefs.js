@@ -42,6 +42,12 @@ const typeDefs = gql`
     COMPLETE
   }
 
+  enum TaskStatusType {
+    ACTIVE
+    SUCCEEDED
+    FAILED
+  }
+
   type SshKey {
     id: Int
     name: String
@@ -292,6 +298,7 @@ const typeDefs = gql`
     monitoringUrls: String
     deployments: [Deployment]
     backups: [Backup]
+    tasks: [Task]
   }
 
   type EnviornmentHitsMonth {
@@ -336,6 +343,18 @@ const typeDefs = gql`
     buildLog: String
   }
 
+  type Task {
+    id: Int
+    name: String
+    status: String
+    created: String
+    started: String
+    completed: String
+    environment: Environment
+    remoteId: String
+    logs: String
+  }
+
   input DeleteEnvironmentInput {
     name: String!
     project: Int!
@@ -366,6 +385,7 @@ const typeDefs = gql`
       openshiftProjectName: String!
     ): Environment
     deploymentByRemoteId(id: String): Deployment
+    taskByRemoteId(id: String): Task
     """
     Returns all Project Objects matching given filters (all if no filter defined)
     """
@@ -474,6 +494,36 @@ const typeDefs = gql`
   input UpdateDeploymentInput {
     id: Int!
     patch: UpdateDeploymentPatchInput!
+  }
+
+  input TaskInput {
+    id: Int
+    name: String!
+    status: TaskStatusType!
+    created: String!
+    started: String
+    completed: String
+    environment: Int!
+    remoteId: String
+  }
+
+  input DeleteTaskInput {
+    id: Int!
+  }
+
+  input UpdateTaskPatchInput {
+    name: String
+    status: TaskStatusType
+    created: String
+    started: String
+    completed: String
+    environment: Int
+    remoteId: String
+  }
+
+  input UpdateTaskInput {
+    id: Int!
+    patch: UpdateTaskPatchInput!
   }
 
   input AddOpenshiftInput {
@@ -744,6 +794,9 @@ const typeDefs = gql`
     updateDeployment(input: UpdateDeploymentInput): Deployment
     addBackup(input: AddBackupInput!): Backup
     deleteAllBackups: String
+    addTask(input: TaskInput!): Task
+    deleteTask(input: DeleteTaskInput!): String
+    updateTask(input: UpdateTaskInput): Task
   }
 `;
 
